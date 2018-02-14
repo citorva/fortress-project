@@ -3,9 +3,9 @@ import gradient
 
 pygame.init()
 
-size = (pygame.display.Info().current_w//2,pygame.display.Info().current_h//2)
+size = (pygame.display.Info().current_w,pygame.display.Info().current_h)
 
-window = pygame.display.set_mode(size,pygame.HWSURFACE | pygame.DOUBLEBUF)
+window = pygame.display.set_mode(size,pygame.FULLSCREEN | pygame.HWSURFACE | pygame.DOUBLEBUF)
 run = True
 gradient = gradient.GradientAnimation(window, (0,0), size,pygame.Color(126,163,208), pygame.Color(173,248,253),
                             pygame.Color(127,0,0), pygame.Color(255,0,0), 5, Direction.TTB, 32, 60)
