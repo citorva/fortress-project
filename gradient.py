@@ -10,36 +10,56 @@ class Direction(enum.Enum):
 
 class Gradient():
     def __init__(self, parent, position, size, start_color = pygame.Color(0,0,0), end_color = pygame.Color(255,255,255), direction = Direction.LTR, occurrence = -1):
-        self.surface = pygame.Surface(size)
         self.occurrence = occurrence
         self.direction = direction
-        self.size = size
         self.parent = parent
         self.position = position
+        self.start_color = start_color
+        self.end_color = end_color
+        print(size)
 
-        if direction == Direction.LTR or direction == Direction.RTL:
+        self.resize(size)
+
+    def resize(self, size):
+        self.surface = pygame.Surface(size)
+        self.size = size
+        if self.direction == Direction.LTR or self.direction == Direction.RTL:
             if self.occurrence < 1 or self.occurrence > self.size[0]:
                 self.occurrence = size[0]
         else:
             if self.occurrence < 1 or self.occurrence > self.size[1]:
                 self.occurrence = size[1]
-
-        self.set_color(start_color, end_color)
+        self.set_color(self.start_color, self.end_color)
 
     def gen_rect(self):
         ret = []
+        print(self.surface.get_width(),self.surface.get_height())
+        print(self.surface.get_height(),"/",self.occurrence, '=', self.surface.get_height() / self.occurrence)
         x,y,w,h = 0,0,0,0
         for i in range(self.occurrence):
-            if self.direction == Direction.LTR or self.direction == Direction.RTL:
-                x, y, w, h = int(self.size[0]//self.occurrence*i), 0, self.size[0]//self.occurrence, self.size[1]
+            if self.direction == Direction.TTB or self.direction == Direction.BTT:
+                if i != self.occurrence // 2:
+                    h = int(self.surface.get_height()/self.occurrence)
+                else:
+                    h = int(self.surface.get_height()/self.occurrence)+(self.surface.get_height()%self.occurrence)
+                w = self.surface.get_width()
+                x = 0
+                ret.append((x,y,w,h))
+                y = y + h
             else:
-                x, y, w, h = 0, int(self.size[1]//self.occurrence*i), self.size[0], self.size[1]//self.occurrence
-
-            ret.append((x,y,w,h))
+                if i != self.occurrence // 2:
+                    w = int(self.surface.get_width()/self.occurrence)
+                else:
+                    w = int(self.surface.get_width()/self.occurrence)+(self.surface.get_width()%self.occurrence)
+                h = self.surface.get_height()
+                y = 0
+                ret.append((x,y,w,h))
+                x = x + w
         if self.direction == Direction.BTT or self.direction == Direction.LTR:
             tmp = ret
-            for i in range(self.occurrence):
-                ret[i] = tmp[-i]
+            ret = []
+            for i in range(self.occurrence-1,-1,-1):
+                ret.append(tmp[i])
         return ret
 
     def gen_color(self, start_color, end_color, occurrence, index):
@@ -50,6 +70,8 @@ class Gradient():
         return pygame.Color(r_coeff,g_coeff,b_coeff,a_coeff)
 
     def set_color(self,start_color, end_color):
+        self.start_color = start_color
+        self.end_color = end_color
         rects = self.gen_rect()
         for i in range(len(rects)):
             color = self.gen_color(start_color,end_color,self.occurrence,i)
